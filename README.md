@@ -35,8 +35,10 @@ Whisper model and speaker diarization — nothing leaves your machine. See
   macOS **Multi-Output Device** (Audio MIDI Setup app) combining your
   speakers + BlackHole, and set that as your system output during calls. See
   [ADR 0001](docs/adr/0001-system-audio-capture.md) for why this is
-  necessary. Alternatively, macOS Teams exposes a built-in "Microsoft Teams
-  Audio" input device that the app will detect automatically.
+  necessary. (macOS Teams also exposes its own "Microsoft Teams Audio"
+  input device, but the app doesn't offer it as a speaker option since it
+  only captures Teams call audio — BlackHole via a Multi-Output Device
+  captures everything and works for any app.)
 
 ## Configuration
 
