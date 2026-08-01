@@ -7,6 +7,7 @@ class AudioDevice(BaseModel):
     index: int
     name: str
     max_input_channels: int
+    max_output_channels: int
     default_samplerate: float
     is_likely_loopback: bool
 
