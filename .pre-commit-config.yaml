@@ -1,0 +1,56 @@
+# See https://pre-commit.com for usage and config
+repos:
+  - repo: local
+    hooks:
+      # --- pre-commit stage: fast lint ---
+      - id: backend-ruff-lint
+        name: backend ruff lint
+        entry: bash -c 'cd backend && uv run ruff check .'
+        language: system
+        files: ^backend/.*\.py$
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: frontend-oxlint
+        name: frontend oxlint
+        entry: bash -c 'cd frontend && npm run lint'
+        language: system
+        files: ^frontend/.*\.(ts|tsx|js|jsx)$
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: electron-oxlint
+        name: electron oxlint
+        entry: bash -c 'cd electron && npm run lint'
+        language: system
+        files: ^electron/.*\.js$
+        pass_filenames: false
+        stages: [pre-commit]
+
+      # --- pre-push stage: typecheck + tests ---
+      - id: backend-ty
+        name: backend ty typecheck
+        entry: bash -c 'cd backend && uv run ty check .'
+        language: system
+        files: ^backend/.*\.py$
+        pass_filenames: false
+        stages: [pre-push]
+
+      - id: frontend-typecheck
+        name: frontend tsc typecheck
+        entry: bash -c 'cd frontend && npm run typecheck'
+        language: system
+        files: ^frontend/.*\.(ts|tsx)$
+        pass_filenames: false
+        stages: [pre-push]
+
+      - id: backend-pytest
+        name: backend pytest
+        entry: >-
+          bash -c 'cd backend && uv run pytest;
+          code=$?;
+          if [ "$code" -eq 5 ]; then exit 0; else exit "$code"; fi'
+        language: system
+        files: ^backend/.*\.py$
+        pass_filenames: false
+        stages: [pre-push]

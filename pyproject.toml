@@ -1,0 +1,11 @@
+[project]
+name = "transcribe-dev-tools"
+version = "0.1.0"
+description = "Repo-level dev tooling (not the app itself; see backend/ and frontend/)"
+requires-python = ">=3.11"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.0",
+]

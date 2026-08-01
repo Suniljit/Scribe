@@ -1,0 +1,42 @@
+{
+  "name": "transcribe-electron",
+  "version": "0.1.0",
+  "description": "Local-first meeting transcriber (macOS app shell)",
+  "main": "src/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "ELECTRON_START_URL=http://localhost:5173 electron .",
+    "dist": "electron-builder",
+    "lint": "oxlint"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8",
+    "oxlint": "^1.76.0"
+  },
+  "build": {
+    "appId": "com.sunil.transcribe",
+    "productName": "Transcribe",
+    "files": [
+      "src/**/*",
+      "../frontend/dist/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../backend",
+        "to": "backend",
+        "filter": [
+          "**/*",
+          "!.venv",
+          "!data/recordings/*",
+          "!data/transcripts/*"
+        ]
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": "dmg"
+    }
+  }
+}
