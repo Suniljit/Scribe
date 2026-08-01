@@ -7,6 +7,7 @@ class AudioDevice(BaseModel):
     index: int
     name: str
     max_input_channels: int
+    max_output_channels: int
     default_samplerate: float
     is_likely_loopback: bool
 
@@ -31,6 +32,9 @@ class RecordingMeta(BaseModel):
     mic_device_index: int
     speaker_device_index: int | None = None
     audio_path: str | None = None
+    mic_audio_path: str | None = None
+    speaker_audio_path: str | None = None
+    drift_offsets: list[tuple[float, float]] | None = None
     bleed_detected: bool = False
 
 

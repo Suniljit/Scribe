@@ -4,7 +4,9 @@ from app import storage
 from app.models import TranscriptJob, TranscriptResult
 from app.transcription import get_job, get_result, start_transcription
 
-router = APIRouter(prefix="/api/recordings/{recording_id}/transcript", tags=["transcripts"])
+router = APIRouter(
+    prefix="/api/recordings/{recording_id}/transcript", tags=["transcripts"]
+)
 
 
 @router.post("", response_model=TranscriptJob)
@@ -12,7 +14,13 @@ def transcribe(recording_id: str) -> TranscriptJob:
     meta = storage.load_meta(recording_id)
     if meta is None or not meta.audio_path:
         raise HTTPException(status_code=404, detail="Recording audio not found")
-    return start_transcription(recording_id, meta.audio_path)
+    return start_transcription(
+        recording_id,
+        meta.audio_path,
+        mic_audio_path=meta.mic_audio_path,
+        speaker_audio_path=meta.speaker_audio_path,
+        drift_offsets=meta.drift_offsets,
+    )
 
 
 @router.get("/status", response_model=TranscriptJob)

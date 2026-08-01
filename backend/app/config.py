@@ -15,6 +15,10 @@ TRANSCRIPTS_DIR.mkdir(parents=True, exist_ok=True)
 SAMPLE_RATE = 16000
 CHANNELS = 1
 
+# How often to re-estimate mic/speaker clock drift during a recording, for
+# aligning per-track transcript timestamps before merging (ADR 0005).
+DRIFT_RESYNC_WINDOW_SECONDS = 60
+
 # faster-whisper model size. large-v3 chosen for accuracy; int8 compute type keeps
 # peak RAM well under the 10GB budget on CPU (no MPS support in CTranslate2 on macOS).
 WHISPER_MODEL = os.environ.get("TRANSCRIBE_WHISPER_MODEL", "large-v3")

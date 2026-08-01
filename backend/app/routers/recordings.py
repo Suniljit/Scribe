@@ -25,7 +25,9 @@ def start_recording(req: StartRecordingRequest) -> RecordingMeta:
     try:
         recorder.start()
     except Exception as exc:
-        raise HTTPException(status_code=400, detail=f"Failed to start recording: {exc}") from exc
+        raise HTTPException(
+            status_code=400, detail=f"Failed to start recording: {exc}"
+        ) from exc
 
     _active_recorders[recording_id] = recorder
     now = datetime.now(UTC)
@@ -55,6 +57,13 @@ def stop_recording(recording_id: str) -> RecordingMeta:
     meta.status = RecordingStatus.STOPPED
     meta.duration_seconds = duration
     meta.audio_path = str(audio_path)
+    meta.mic_audio_path = (
+        str(recorder.mic_audio_path) if recorder.mic_audio_path else None
+    )
+    meta.speaker_audio_path = (
+        str(recorder.speaker_audio_path) if recorder.speaker_audio_path else None
+    )
+    meta.drift_offsets = recorder.drift_offsets or None
     meta.bleed_detected = recorder.bleed_detected
     storage.save_meta(meta)
     return meta
