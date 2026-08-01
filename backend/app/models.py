@@ -31,6 +31,9 @@ class RecordingMeta(BaseModel):
     mic_device_index: int
     speaker_device_index: int | None = None
     audio_path: str | None = None
+    mic_audio_path: str | None = None
+    speaker_audio_path: str | None = None
+    drift_offsets: list[tuple[float, float]] | None = None
     bleed_detected: bool = False
 
 
