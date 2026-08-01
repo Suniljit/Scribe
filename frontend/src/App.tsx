@@ -140,8 +140,8 @@ function App() {
               disabled={activeRecordingId !== null}
             />
             <DeviceSelector
-              label="Speaker (for Teams calls)"
-              devices={devices}
+              label="Speaker (system audio)"
+              devices={devices.filter((d) => d.is_likely_loopback)}
               value={speakerIndex}
               onChange={setSpeakerIndex}
               allowNone

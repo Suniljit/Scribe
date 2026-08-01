@@ -4,6 +4,7 @@ export interface AudioDevice {
   index: number;
   name: string;
   max_input_channels: number;
+  max_output_channels: number;
   default_samplerate: number;
   is_likely_loopback: boolean;
 }
