@@ -30,15 +30,37 @@ Whisper model and speaker diarization — nothing leaves your machine. See
   "Gated" models require accepting the model's terms on Hugging Face (while
   logged in) before your token can download it — visit each gated model's
   page above and click "Agree and access repository".
-- To capture **speaker audio** (e.g. Teams call audio), install
-  [BlackHole 2ch](https://github.com/ExistentialAudio/BlackHole) and create a
-  macOS **Multi-Output Device** (Audio MIDI Setup app) combining your
-  speakers + BlackHole, and set that as your system output during calls. See
+- To capture **speaker audio** (e.g. Teams call audio), macOS gives
+  sandboxed apps no way to record arbitrary system output directly, so you
+  need to install [BlackHole 2ch](https://github.com/ExistentialAudio/BlackHole)
+  and route your system audio through it. See
   [ADR 0001](docs/adr/0001-system-audio-capture.md) for why this is
-  necessary. (macOS Teams also exposes its own "Microsoft Teams Audio"
-  input device, but the app doesn't offer it as a speaker option since it
-  only captures Teams call audio — BlackHole via a Multi-Output Device
-  captures everything and works for any app.)
+  necessary. One-time setup:
+
+  1. Install [BlackHole 2ch](https://github.com/ExistentialAudio/BlackHole)
+     (download the installer from the link, or `brew install blackhole-2ch`).
+  2. Open **Audio MIDI Setup** (Applications > Utilities > Audio MIDI
+     Setup.app).
+  3. Click the **+** button in the bottom-left corner and choose
+     **Create Multi-Output Device**.
+  4. In the device list on the right, check both your normal output (e.g.
+     "MacBook Pro Speakers" or your headphones) and **"BlackHole 2ch"**.
+     Leave your normal output as the primary/master device so timing stays
+     correct.
+  5. Before starting a call, open **System Settings > Sound > Output** and
+     select the Multi-Output Device you just created. You'll still hear
+     audio normally — it's now also being duplicated into BlackHole.
+  6. In Scribe, pick **"BlackHole 2ch"** as the speaker input device (it
+     will be labeled "BlackHole 2ch (likely loopback)" in the device
+     dropdown).
+  7. After the call, switch **System Settings > Sound > Output** back to
+     your normal speakers/headphones if you don't want audio routed
+     through the Multi-Output Device all the time.
+
+  (macOS Teams also exposes its own "Microsoft Teams Audio" input device,
+  but the app doesn't offer it as a speaker option since it only captures
+  Teams call audio — BlackHole via a Multi-Output Device captures
+  everything and works for any app.)
 
 ## Configuration
 
