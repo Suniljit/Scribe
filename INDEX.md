@@ -1,5 +1,10 @@
 # Docs index
 
+## Design
+| Document | Status | Depends on | Description |
+|---|---|---|---|
+| [PRD](docs/design/prd.md) | draft | — | Problem, persona, scope, user stories, success metrics for Scribe |
+
 - [README.md](README.md) — setup and usage
 - [docs/adr/0001-system-audio-capture.md](docs/adr/0001-system-audio-capture.md) — how Teams call audio gets captured
 - [docs/adr/0002-transcription-stack.md](docs/adr/0002-transcription-stack.md) — whisperx / model choice
