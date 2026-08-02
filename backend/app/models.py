@@ -51,6 +51,7 @@ class TranscriptSegment(BaseModel):
     end: float
     speaker: str | None = None
     text: str
+    avg_logprob: float | None = None
 
 
 class TranscriptJob(BaseModel):

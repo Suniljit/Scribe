@@ -20,6 +20,7 @@ def transcribe(recording_id: str) -> TranscriptJob:
         mic_audio_path=meta.mic_audio_path,
         speaker_audio_path=meta.speaker_audio_path,
         drift_offsets=meta.drift_offsets,
+        bleed_detected=meta.bleed_detected,
     )
 
 
