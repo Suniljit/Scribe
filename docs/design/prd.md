@@ -2,7 +2,7 @@
 doc_type: prd
 status: draft
 depends_on: []
-last_updated: 2026-08-02
+last_updated: 2026-08-03
 ---
 
 # Scribe — PRD
@@ -89,34 +89,42 @@ Single-user, local-first tool — no multi-user roles or auth in scope.
 
 ### Record an online meeting
 **Feature:** Recording
+**As a** solo user, **I want** to capture both my mic and the meeting's speaker/loopback audio, **so that** I have a full local recording of an online meeting without a bot joining the call.
 **Given** I've selected a mic device and a speaker/loopback device, **When** I start a recording and later stop it, **Then** the app saves the meeting's audio locally, with no audio sent off the device.
 
 ### Record a physical meeting
 **Feature:** Recording
+**As a** solo user, **I want** to record an in-person meeting using just my mic, **so that** I get the same local capture and notes pipeline for meetings a cloud bot could never join.
 **Given** I'm in an in-person meeting with no online call running, **When** I start a recording using only my mic device, **Then** the app captures and saves the meeting audio the same way as an online meeting.
 
 ### Get a diarized transcript
 **Feature:** Transcription
+**As a** solo user, **I want** a speaker-labeled transcript produced entirely on-device, **so that** I can tell who said what without any audio leaving my machine.
 **Given** a completed recording, **When** transcription runs, **Then** I get a single timestamped transcript with speaker labels, produced entirely by local models.
 
 ### Get structured meeting notes
 **Feature:** Notes Generation
+**As a** solo user, **I want** structured notes generated from the transcript, **so that** I never have to write up a summary, action items, or decisions by hand.
 **Given** a completed transcript, **When** notes generation runs, **Then** I get a summary, action items, key decisions, and a topic breakdown, generated via my selected local or cloud model.
 
 ### Choose local vs cloud for notes
 **Feature:** Notes Generation
+**As a** solo user, **I want** to pick and always see whether notes generation is running locally or in the cloud, **so that** I control the privacy/quality tradeoff for each meeting's notes.
 **Given** I'm in settings, **When** I toggle notes generation between local and cloud, **Then** subsequent notes generation uses that model, and the active choice is always visible.
 
 ### Organize meetings into projects
 **Feature:** Projects
+**As a** solo user, **I want** to group meetings into projects and filter by project or date, **so that** I can find past meetings and decisions without scrolling through everything.
 **Given** one or more recorded meetings, **When** I create a project and assign meetings to it, **Then** I can view and filter meetings by that project and by date.
 
 ### Chat with a single meeting
 **Feature:** Meeting Chatbot
+**As a** solo user, **I want** to ask questions about one meeting, **so that** I can recall specific details without rereading the whole transcript.
 **Given** a meeting with a completed transcript, **When** I ask a question in that meeting's chat, **Then** I get an answer grounded only in that meeting's transcript and notes.
 
 ### Chat across a project
 **Feature:** Project Chatbot
+**As a** solo user, **I want** to ask questions across all meetings in a project, **so that** I can track decisions and context that span multiple meetings in that project.
 **Given** a project with multiple meetings, **When** I ask a question in the project-level chat, **Then** I get an answer synthesized across all meetings' transcripts and notes within that project only.
 
 ## Success Metrics (KPIs)
