@@ -1,17 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { AudioPlayer } from "@/components/AudioPlayer";
 import { DeviceSelector } from "@/components/DeviceSelector";
 import { RecordingsList } from "@/components/RecordingsList";
 import { TranscriptView } from "@/components/TranscriptView";
 import { api } from "@/lib/api";
+import { formatTime } from "@/lib/utils";
 import type { AudioDevice, RecordingMeta, TranscriptJob, TranscriptResult } from "@/lib/api";
-
-function formatElapsed(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
-}
 
 function App() {
   const [devices, setDevices] = useState<AudioDevice[]>([]);
@@ -185,7 +181,7 @@ function App() {
               </Button>
             ) : (
               <Button variant="destructive" onClick={handleStop}>
-                Stop ({formatElapsed(elapsed)})
+                Stop ({formatTime(elapsed)})
               </Button>
             )}
           </div>
@@ -201,6 +197,9 @@ function App() {
                   We noticed your speaker audio may be leaking into your microphone — consider using headphones next
                   time.
                 </p>
+              )}
+              {selectedRecording.status === "stopped" && selectedRecording.audio_path && (
+                <AudioPlayer key={selectedRecording.id} src={api.audioUrl(selectedRecording.id)} />
               )}
               <div className="flex-1 overflow-hidden">
                 <TranscriptView

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { api } from "@/lib/api";
+import { formatTime } from "@/lib/utils";
 import type { RecordingMeta, TranscriptJob, TranscriptResult } from "@/lib/api";
 
 interface Props {
@@ -8,12 +9,6 @@ interface Props {
   job: TranscriptJob | null;
   result: TranscriptResult | null;
   onTranscribe: () => void;
-}
-
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
 const SPEAKER_COLORS = [
