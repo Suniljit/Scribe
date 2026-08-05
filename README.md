@@ -115,8 +115,12 @@ uv run pre-commit install --hook-type pre-commit --hook-type pre-push
 
 - First transcription run downloads the Whisper large-v3 and pyannote model
   weights (several GB) — this can take a while depending on your connection.
-- Transcription is CPU-only (no MPS support in the underlying CTranslate2
-  runtime) and runs slower than real time by design — accuracy was
-  prioritized over speed. See [ADR 0002](docs/adr/0002-transcription-stack.md).
+- The whisper transcription stage is CPU-only (no MPS support in the
+  underlying CTranslate2 runtime) and runs slower than real time by design —
+  accuracy was prioritized over speed. See
+  [ADR 0002](docs/adr/0002-transcription-stack.md). Word alignment and
+  speaker diarization run on plain PyTorch and default to MPS when
+  available; set `TRANSCRIBE_AUX_DEVICE=cpu` to force them back to CPU. See
+  [ADR 0007](docs/adr/0007-mps-alignment-diarization.md).
 - Recordings and transcripts are stored under `backend/data/` and are never
   committed to git.

@@ -10,3 +10,4 @@
 - [docs/adr/0002-transcription-stack.md](docs/adr/0002-transcription-stack.md) — whisperx / model choice
 - [docs/adr/0005-per-track-transcription.md](docs/adr/0005-per-track-transcription.md) — dual-track transcription + diarization + drift correction
 - [docs/adr/0003-electron-backend-packaging.md](docs/adr/0003-electron-backend-packaging.md) — how the macOS app runs the backend
+- [docs/adr/0007-mps-alignment-diarization.md](docs/adr/0007-mps-alignment-diarization.md) — MPS for word alignment + diarization

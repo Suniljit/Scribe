@@ -4,6 +4,7 @@ import threading
 from difflib import SequenceMatcher
 
 from app.config import (
+    AUX_DEVICE,
     HF_TOKEN,
     TRANSCRIPTS_DIR,
     WHISPER_COMPUTE_TYPE,
@@ -197,14 +198,14 @@ def _run_single_track_pipeline(
         )
     )
     align_model, align_metadata = whisperx.load_align_model(
-        language_code=language, device=WHISPER_DEVICE
+        language_code=language, device=AUX_DEVICE
     )
     result = whisperx.align(
         result["segments"],
         align_model,
         align_metadata,
         audio,
-        WHISPER_DEVICE,
+        AUX_DEVICE,
         return_char_alignments=False,
     )
     del align_model
@@ -226,7 +227,7 @@ def _run_single_track_pipeline(
     diarize_model = whisperx.diarize.DiarizationPipeline(
         model_name="pyannote/speaker-diarization-3.1",
         token=HF_TOKEN,
-        device=WHISPER_DEVICE,
+        device=AUX_DEVICE,
     )
     diarize_segments = diarize_model(audio)
     result = whisperx.assign_word_speakers(diarize_segments, result)

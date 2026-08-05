@@ -20,10 +20,24 @@ CHANNELS = 1
 DRIFT_RESYNC_WINDOW_SECONDS = 60
 
 # faster-whisper model size. large-v3 chosen for accuracy; int8 compute type keeps
-# peak RAM well under the 10GB budget on CPU (no MPS support in CTranslate2 on macOS).
+# peak RAM well under the 10GB budget on CPU. This stage runs on CTranslate2,
+# which has no MPS backend on macOS, so it always runs on CPU (ADR 0002).
 WHISPER_MODEL = os.environ.get("TRANSCRIBE_WHISPER_MODEL", "large-v3")
 WHISPER_COMPUTE_TYPE = os.environ.get("TRANSCRIBE_WHISPER_COMPUTE", "int8")
 WHISPER_DEVICE = os.environ.get("TRANSCRIBE_WHISPER_DEVICE", "cpu")
+
+
+def _default_aux_device() -> str:
+    import torch
+
+    return "mps" if torch.backends.mps.is_available() else "cpu"
+
+
+# Device for word alignment (wav2vec2) and speaker diarization (pyannote.audio),
+# which run on plain PyTorch and support MPS, unlike the whisper stage above
+# (ADR 0007). Defaults to MPS when available, else CPU; override to force a
+# specific device (e.g. "cpu" to work around an MPS op gap).
+AUX_DEVICE = os.environ.get("TRANSCRIBE_AUX_DEVICE") or _default_aux_device()
 
 # Required for pyannote speaker-diarization-3.1 (gated model on Hugging Face).
 HF_TOKEN = os.environ.get("HF_TOKEN")
