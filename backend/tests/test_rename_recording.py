@@ -17,6 +17,12 @@ def client(tmp_path, monkeypatch):
     return TestClient(app)
 
 
+def _load_meta(recording_id: str) -> RecordingMeta:
+    meta = storage.load_meta(recording_id)
+    assert meta is not None
+    return meta
+
+
 def _make_meta(recording_id: str, name: str) -> RecordingMeta:
     return RecordingMeta(
         id=recording_id,
@@ -35,7 +41,7 @@ def test_rename_updates_and_persists_name(client):
 
     assert res.status_code == 200
     assert res.json()["name"] == "New Name"
-    assert storage.load_meta("abc123").name == "New Name"
+    assert _load_meta("abc123").name == "New Name"
 
 
 def test_rename_nonexistent_recording_returns_404(client):
@@ -51,4 +57,4 @@ def test_rename_with_blank_name_is_rejected(client):
     res = client.patch("/api/recordings/abc123", json={"name": "   "})
 
     assert res.status_code == 422
-    assert storage.load_meta("abc123").name == "Old Name"
+    assert _load_meta("abc123").name == "Old Name"
