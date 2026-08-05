@@ -1,8 +1,10 @@
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import Response
 
 from app import storage
 from app.models import TranscriptJob, TranscriptResult
 from app.transcription import get_job, get_result, start_transcription
+from app.vtt import to_vtt
 
 router = APIRouter(
     prefix="/api/recordings/{recording_id}/transcript", tags=["transcripts"]
@@ -35,3 +37,17 @@ def get_transcript(recording_id: str) -> TranscriptResult:
     if result is None:
         raise HTTPException(status_code=404, detail="Transcript not found")
     return result
+
+
+@router.get("/vtt")
+def get_transcript_vtt(recording_id: str) -> Response:
+    result = get_result(recording_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Transcript not found")
+    return Response(
+        content=to_vtt(result),
+        media_type="text/vtt",
+        headers={
+            "Content-Disposition": f'attachment; filename="{recording_id}.vtt"'
+        },
+    )
