@@ -52,6 +52,12 @@ def _set_job(job: TranscriptJob) -> None:
         _jobs[job.recording_id] = job
 
 
+def delete_job(recording_id: str) -> None:
+    _transcript_path(recording_id).unlink(missing_ok=True)
+    with _jobs_lock:
+        _jobs.pop(recording_id, None)
+
+
 def _get_whisper_model():
     global _whisper_model
     with _model_lock:

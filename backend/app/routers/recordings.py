@@ -7,6 +7,7 @@ from fastapi.responses import FileResponse
 from app import storage
 from app.models import RecordingMeta, RecordingStatus, StartRecordingRequest
 from app.recorder import Recorder
+from app.transcription import delete_job
 
 router = APIRouter(prefix="/api/recordings", tags=["recordings"])
 
@@ -87,5 +88,10 @@ def get_recording_audio(recording_id: str) -> FileResponse:
 
 @router.delete("/{recording_id}")
 def delete_recording(recording_id: str) -> dict:
+    if recording_id in _active_recorders:
+        raise HTTPException(
+            status_code=400, detail="Cannot delete a recording in progress"
+        )
     storage.delete_recording(recording_id)
+    delete_job(recording_id)
     return {"deleted": recording_id}
