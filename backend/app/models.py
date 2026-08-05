@@ -40,6 +40,10 @@ class RenameRecordingRequest(BaseModel):
         return v
 
 
+class TrackOffsetRequest(BaseModel):
+    offset_ms: float
+
+
 class RecordingStatus(str, Enum):
     RECORDING = "recording"
     STOPPED = "stopped"

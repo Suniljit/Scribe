@@ -11,6 +11,7 @@ from app.models import (
     RecordingStatus,
     RenameRecordingRequest,
     StartRecordingRequest,
+    TrackOffsetRequest,
 )
 from app.recorder import Recorder
 from app.transcription import delete_job
@@ -53,6 +54,25 @@ def start_recording(req: StartRecordingRequest) -> RecordingMeta:
         capture_source=req.capture_source,
     )
     storage.save_meta(meta)
+    return meta
+
+
+@router.post("/{recording_id}/track-offset", response_model=RecordingMeta)
+def set_track_start_offset(
+    recording_id: str, req: TrackOffsetRequest
+) -> RecordingMeta:
+    """Records how much later (ms) the speaker track's browser-push capture
+    pipeline became ready relative to the mic track's, so `Recorder.stop()`
+    can pad the lagging track with leading silence and align both tracks'
+    timelines (see frontend/src/lib/capture.ts, ADR 0007)."""
+    recorder = _active_recorders.get(recording_id)
+    if recorder is None:
+        raise HTTPException(status_code=404, detail="No active recording with that id")
+    recorder.speaker_start_offset_ms = req.offset_ms
+
+    meta = storage.load_meta(recording_id)
+    if meta is None:
+        raise HTTPException(status_code=404, detail="Recording metadata not found")
     return meta
 
 

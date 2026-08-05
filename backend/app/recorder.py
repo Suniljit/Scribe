@@ -71,6 +71,7 @@ class Recorder:
         self.mic_audio_path: Path | None = None
         self.speaker_audio_path: Path | None = None
         self.drift_offsets: list[tuple[float, float]] = []
+        self.speaker_start_offset_ms: float = 0.0
 
     def start(self) -> None:
         if self.capture_source == "browser-push":
@@ -214,6 +215,9 @@ class Recorder:
             if speaker_audio.ndim > 1:
                 speaker_audio = speaker_audio.mean(axis=1)
             speaker_track = _resample_to(speaker_audio, speaker_rate, SAMPLE_RATE)
+            mic_track, speaker_track = _pad_track_start_offset(
+                mic_track, speaker_track, self.speaker_start_offset_ms, SAMPLE_RATE
+            )
 
         return mic_track, speaker_track
 
@@ -234,6 +238,32 @@ def _resample_to(audio: np.ndarray, orig_rate: int, target_rate: int) -> np.ndar
         return audio
     target_len = round(len(audio) * target_rate / orig_rate)
     return resample(audio, target_len).astype(np.float32)
+
+
+def _pad_track_start_offset(
+    mic_track: np.ndarray,
+    speaker_track: np.ndarray,
+    speaker_start_offset_ms: float,
+    sample_rate: int,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Align mic/speaker "sample 0" to the same wall-clock moment by padding
+    whichever track's capture pipeline became ready later with that much
+    leading silence (see docs/adr/0007-native-audio-capture.md). This
+    corrects the static start-offset browser-push capture can introduce
+    (e.g. a screen-share permission prompt delaying speaker capture by
+    seconds), which is far larger than `_estimate_drift`'s lag search window
+    and would otherwise leave `_dedup_bleed_segments` unable to match
+    duplicate segments across tracks.
+    """
+    if speaker_start_offset_ms == 0:
+        return mic_track, speaker_track
+
+    pad_samples = round(abs(speaker_start_offset_ms) / 1000 * sample_rate)
+    if speaker_start_offset_ms > 0:
+        speaker_track = np.pad(speaker_track, (pad_samples, 0))
+    else:
+        mic_track = np.pad(mic_track, (pad_samples, 0))
+    return mic_track, speaker_track
 
 
 def _detect_bleed(

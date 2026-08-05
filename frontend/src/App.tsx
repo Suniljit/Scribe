@@ -112,6 +112,8 @@ function App() {
               ? "System audio capture isn't available in this browser — recording microphone only."
               : "System audio capture wasn't granted — recording microphone only.",
           );
+        } else {
+          api.setTrackStartOffset(meta.id, capture.speakerStartOffsetMs).catch(() => {});
         }
       } catch (captureError) {
         await api.stopRecording(meta.id).catch(() => {});

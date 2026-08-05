@@ -105,6 +105,12 @@ class TrackStreamer {
 
 export interface BrowserCapture {
   hasSpeaker: boolean;
+  /** How much later (ms) the speaker track's capture pipeline became ready
+   * relative to the mic track's — e.g. a screen-share permission prompt can
+   * delay speaker capture by seconds. `0` when there's no speaker track.
+   * The caller should report this to the backend (see api.setTrackStartOffset)
+   * so the two tracks' timelines can be aligned before transcription. */
+  speakerStartOffsetMs: number;
   stop: () => Promise<void>;
 }
 
@@ -117,18 +123,24 @@ export async function startBrowserCapture(
   mode: Exclude<CaptureMode, "coreaudio-manual">,
   recordingId: string,
 ): Promise<BrowserCapture> {
+  const t0 = performance.now();
+
   const micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
   const micStreamer = new TrackStreamer();
   await micStreamer.start(recordingId, "mic", micStream);
+  const micReadyAt = performance.now() - t0;
 
   let speakerStreamer: TrackStreamer | null = null;
   let hasSpeaker = false;
+  let speakerStartOffsetMs = 0;
   try {
     const speakerStream =
       mode === "electron-loopback" ? await getElectronLoopbackStream() : await getBrowserDisplayMediaStream();
     if (speakerStream.getAudioTracks().length > 0) {
       speakerStreamer = new TrackStreamer();
       await speakerStreamer.start(recordingId, "speaker", speakerStream);
+      const speakerReadyAt = performance.now() - t0;
+      speakerStartOffsetMs = speakerReadyAt - micReadyAt;
       hasSpeaker = true;
     } else {
       speakerStream.getTracks().forEach((t) => t.stop());
@@ -139,6 +151,7 @@ export async function startBrowserCapture(
 
   return {
     hasSpeaker,
+    speakerStartOffsetMs,
     stop: async () => {
       await Promise.all([micStreamer.stop(), speakerStreamer?.stop() ?? Promise.resolve()]);
     },
