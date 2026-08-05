@@ -107,6 +107,23 @@ function App() {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    const recording = recordings.find((r) => r.id === id);
+    if (!window.confirm(`Delete "${recording?.name ?? id}"? This cannot be undone.`)) return;
+    setError(null);
+    try {
+      await api.deleteRecording(id);
+      if (id === selectedId) {
+        setSelectedId(null);
+        setJob(null);
+        setTranscript(null);
+      }
+      await refreshRecordings();
+    } catch (e) {
+      setError(String(e));
+    }
+  };
+
   const handleTranscribe = async () => {
     if (!selectedId) return;
     try {
@@ -125,7 +142,12 @@ function App() {
         </div>
         <Separator />
         <div className="flex-1 overflow-hidden">
-          <RecordingsList recordings={recordings} selectedId={selectedId} onSelect={setSelectedId} />
+          <RecordingsList
+            recordings={recordings}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            onDelete={handleDelete}
+          />
         </div>
       </aside>
 

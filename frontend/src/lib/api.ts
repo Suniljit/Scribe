@@ -74,6 +74,9 @@ export const api = {
 
   stopRecording: (id: string) => request<RecordingMeta>(`/api/recordings/${id}/stop`, { method: "POST" }),
 
+  deleteRecording: (id: string) =>
+    request<{ deleted: string }>(`/api/recordings/${id}`, { method: "DELETE" }),
+
   audioUrl: (id: string) => `${API_BASE}/api/recordings/${id}/audio`,
 
   transcriptVttUrl: (id: string) => `${API_BASE}/api/recordings/${id}/transcript/vtt`,
