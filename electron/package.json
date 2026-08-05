@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "start": "electron .",
-    "dev": "ELECTRON_START_URL=http://localhost:5173 electron .",
+    "dev": "ELECTRON_START_URL=http://localhost:5174 electron .",
     "dist": "electron-builder",
     "lint": "oxlint"
   },

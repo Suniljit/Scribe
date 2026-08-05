@@ -2,7 +2,7 @@ const { spawn } = require("node:child_process");
 const path = require("node:path");
 const http = require("node:http");
 
-const BACKEND_PORT = 8000;
+const BACKEND_PORT = 8001;
 const HEALTH_URL = `http://127.0.0.1:${BACKEND_PORT}/api/health`;
 
 function backendDir(isPackaged) {

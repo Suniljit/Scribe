@@ -65,7 +65,7 @@ each terminal session.
 
 ```bash
 cd backend
-uv run uvicorn app.main:app --reload --port 8000
+uv run uvicorn app.main:app --reload --port 8001
 ```
 
 ```bash
@@ -74,7 +74,7 @@ npm install
 npm run dev
 ```
 
-Open <http://localhost:5173>.
+Open <http://localhost:5174>.
 
 ## Running (macOS app)
 
