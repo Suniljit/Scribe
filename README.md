@@ -57,11 +57,6 @@ Whisper model and speaker diarization — nothing leaves your machine. See
      your normal speakers/headphones if you don't want audio routed
      through the Multi-Output Device all the time.
 
-  (macOS Teams also exposes its own "Microsoft Teams Audio" input device,
-  but the app doesn't offer it as a speaker option since it only captures
-  Teams call audio — BlackHole via a Multi-Output Device captures
-  everything and works for any app.)
-
 ## Configuration
 
 ```bash
@@ -103,8 +98,8 @@ server for hot-reload during development.
 ## Development setup
 
 This repo uses [pre-commit](https://pre-commit.com) for lint hooks on commit
-and type-check/test hooks on push (see [ADR 0004](docs/adr/0004-pre-commit-hooks.md)).
-`pre-commit` itself is pinned as a uv dev dependency at the repo root:
+and type-check/test hooks on push. `pre-commit` itself is pinned as a uv dev
+dependency at the repo root:
 
 ```bash
 uv sync
@@ -121,6 +116,6 @@ uv run pre-commit install --hook-type pre-commit --hook-type pre-push
   [ADR 0002](docs/adr/0002-transcription-stack.md). Word alignment and
   speaker diarization run on plain PyTorch and default to MPS when
   available; set `TRANSCRIBE_AUX_DEVICE=cpu` to force them back to CPU. See
-  [ADR 0007](docs/adr/0007-mps-alignment-diarization.md).
+  [ADR 0006](docs/adr/0006-mps-alignment-diarization.md).
 - Recordings and transcripts are stored under `backend/data/` and are never
   committed to git.

@@ -33,5 +33,5 @@ audio ever leaves the machine.
 - Swapping to a smaller Whisper model later only requires changing the
   `TRANSCRIBE_WHISPER_MODEL`/`TRANSCRIBE_WHISPER_COMPUTE` env vars. The
   whisper stage itself stays on CPU as long as it runs on CTranslate2 — see
-  [ADR 0007](0007-mps-alignment-diarization.md) for the alignment/diarization
+  [ADR 0006](0006-mps-alignment-diarization.md) for the alignment/diarization
   stages, which are plain-PyTorch and do use MPS.

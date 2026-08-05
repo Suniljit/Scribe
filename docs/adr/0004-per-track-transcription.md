@@ -1,4 +1,4 @@
-# ADR 0005: Per-track transcription with independent diarization
+# ADR 0004: Per-track transcription with independent diarization
 
 ## Status
 Accepted
