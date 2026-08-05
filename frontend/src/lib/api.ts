@@ -10,6 +10,7 @@ export interface AudioDevice {
 }
 
 export type RecordingStatus = "recording" | "stopped";
+export type CaptureSource = "coreaudio" | "browser-push";
 
 export interface RecordingMeta {
   id: string;
@@ -17,8 +18,9 @@ export interface RecordingMeta {
   created_at: string;
   status: RecordingStatus;
   duration_seconds: number | null;
-  mic_device_index: number;
+  mic_device_index: number | null;
   speaker_device_index: number | null;
+  capture_source: CaptureSource;
   audio_path: string | null;
   bleed_detected: boolean;
 }
@@ -68,8 +70,15 @@ export const api = {
       body: JSON.stringify({
         mic_device_index: micDeviceIndex,
         speaker_device_index: speakerDeviceIndex,
+        capture_source: "coreaudio",
         name,
       }),
+    }),
+
+  startBrowserRecording: (name?: string) =>
+    request<RecordingMeta>("/api/recordings/start", {
+      method: "POST",
+      body: JSON.stringify({ capture_source: "browser-push", name }),
     }),
 
   stopRecording: (id: string) => request<RecordingMeta>(`/api/recordings/${id}/stop`, { method: "POST" }),

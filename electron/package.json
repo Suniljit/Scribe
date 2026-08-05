@@ -15,6 +15,9 @@
     "electron-builder": "^25.1.8",
     "oxlint": "^1.76.0"
   },
+  "dependencies": {
+    "electron-audio-loopback": "^1.0.6"
+  },
   "build": {
     "appId": "com.sunil.transcribe",
     "productName": "Transcribe",

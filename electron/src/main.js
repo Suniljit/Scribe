@@ -1,6 +1,13 @@
 const { app, BrowserWindow, dialog } = require("electron");
 const path = require("node:path");
+const { initMain } = require("electron-audio-loopback");
 const { startBackend, waitForBackend } = require("./backend");
+
+// Enables driver-free system audio capture (desktopCapturer + loopback)
+// on macOS 12.3+/Windows 10+/Linux, replacing the BlackHole requirement
+// (see docs/adr/0001-system-audio-capture.md). Must be called before the
+// app is ready.
+initMain();
 
 let backendProcess = null;
 let mainWindow = null;
@@ -10,6 +17,7 @@ async function createWindow() {
     width: 1200,
     height: 800,
     webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
       nodeIntegration: false,
     },

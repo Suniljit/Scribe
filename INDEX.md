@@ -12,3 +12,4 @@
 - [docs/adr/0004-per-track-transcription.md](docs/adr/0004-per-track-transcription.md) — dual-track transcription + diarization + drift correction
 - [docs/adr/0005-bleed-transcript-dedup.md](docs/adr/0005-bleed-transcript-dedup.md) — post-hoc transcript-level dedup for mic/speaker bleed
 - [docs/adr/0006-mps-alignment-diarization.md](docs/adr/0006-mps-alignment-diarization.md) — MPS for word alignment + diarization
+- [docs/adr/0007-native-audio-capture.md](docs/adr/0007-native-audio-capture.md) — native OS audio capture, replacing BlackHole (supersedes 0001)
