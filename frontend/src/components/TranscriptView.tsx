@@ -9,6 +9,7 @@ interface Props {
   job: TranscriptJob | null;
   result: TranscriptResult | null;
   onTranscribe: () => void;
+  onRenameSpeaker: (oldLabel: string, newName: string) => void;
 }
 
 const SPEAKER_COLORS = [
@@ -19,14 +20,30 @@ const SPEAKER_COLORS = [
   "text-violet-600 dark:text-violet-400",
 ];
 
-function speakerColor(speaker: string | null): string {
-  if (!speaker) return "text-foreground";
+const SPEAKER_DOT_COLORS = [
+  "bg-blue-600 dark:bg-blue-400",
+  "bg-emerald-600 dark:bg-emerald-400",
+  "bg-amber-600 dark:bg-amber-400",
+  "bg-rose-600 dark:bg-rose-400",
+  "bg-violet-600 dark:bg-violet-400",
+];
+
+function speakerIndex(speaker: string): number {
   let hash = 0;
   for (const ch of speaker) hash = (hash + ch.charCodeAt(0)) % SPEAKER_COLORS.length;
-  return SPEAKER_COLORS[hash];
+  return hash;
 }
 
-export function TranscriptView({ recording, job, result, onTranscribe }: Props) {
+function speakerColor(speaker: string | null): string {
+  if (!speaker) return "text-foreground";
+  return SPEAKER_COLORS[speakerIndex(speaker)];
+}
+
+function speakerDotColor(speaker: string): string {
+  return SPEAKER_DOT_COLORS[speakerIndex(speaker)];
+}
+
+export function TranscriptView({ recording, job, result, onTranscribe, onRenameSpeaker }: Props) {
   const isBusy = job?.status === "queued" || job?.status === "running";
 
   if (recording.status === "recording") {
@@ -44,8 +61,33 @@ export function TranscriptView({ recording, job, result, onTranscribe }: Props) 
     );
   }
 
+  const speakers = Array.from(
+    new Set(result.segments.map((seg) => seg.speaker).filter((s): s is string => !!s)),
+  );
+
   return (
     <ScrollArea className="h-full pr-4">
+      {speakers.length > 0 && (
+        <div className="mb-4 flex flex-wrap gap-3 border-b pb-3">
+          {speakers.map((speaker) => (
+            <label key={speaker} className="flex items-center gap-1.5">
+              <span className={`h-2 w-2 shrink-0 rounded-full ${speakerDotColor(speaker)}`} />
+              <input
+                className="w-32 rounded border bg-transparent px-1.5 py-0.5 text-xs"
+                defaultValue={speaker}
+                onBlur={(e) => {
+                  const value = e.target.value.trim();
+                  if (value && value !== speaker) onRenameSpeaker(speaker, value);
+                  else e.target.value = speaker;
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") e.currentTarget.blur();
+                }}
+              />
+            </label>
+          ))}
+        </div>
+      )}
       <div className="flex flex-col gap-4">
         <a
           href={api.transcriptVttUrl(recording.id)}

@@ -92,4 +92,10 @@ export const api = {
   getTranscriptStatus: (id: string) => request<TranscriptJob>(`/api/recordings/${id}/transcript/status`),
 
   getTranscript: (id: string) => request<TranscriptResult>(`/api/recordings/${id}/transcript`),
+
+  renameSpeaker: (id: string, oldLabel: string, newName: string) =>
+    request<TranscriptResult>(`/api/recordings/${id}/transcript/speakers`, {
+      method: "PATCH",
+      body: JSON.stringify({ old_label: oldLabel, new_name: newName }),
+    }),
 };

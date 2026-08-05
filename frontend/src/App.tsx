@@ -139,6 +139,16 @@ function App() {
     }
   };
 
+  const handleRenameSpeaker = async (oldLabel: string, newName: string) => {
+    if (!selectedId) return;
+    try {
+      const result = await api.renameSpeaker(selectedId, oldLabel, newName);
+      setTranscript(result);
+    } catch (e) {
+      setError(String(e));
+    }
+  };
+
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground">
       <aside className="flex w-72 shrink-0 flex-col border-r">
@@ -207,6 +217,7 @@ function App() {
                   job={job}
                   result={transcript}
                   onTranscribe={handleTranscribe}
+                  onRenameSpeaker={handleRenameSpeaker}
                 />
               </div>
             </>

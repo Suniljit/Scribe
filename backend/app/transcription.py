@@ -47,6 +47,19 @@ def get_result(recording_id: str) -> TranscriptResult | None:
     return TranscriptResult.model_validate_json(path.read_text())
 
 
+def rename_speaker(
+    recording_id: str, old_label: str, new_name: str
+) -> TranscriptResult | None:
+    result = get_result(recording_id)
+    if result is None:
+        return None
+    for segment in result.segments:
+        if segment.speaker == old_label:
+            segment.speaker = new_name
+    _transcript_path(recording_id).write_text(result.model_dump_json(indent=2))
+    return result
+
+
 def _set_job(job: TranscriptJob) -> None:
     with _jobs_lock:
         _jobs[job.recording_id] = job
