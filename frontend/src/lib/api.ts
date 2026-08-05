@@ -76,6 +76,8 @@ export const api = {
 
   audioUrl: (id: string) => `${API_BASE}/api/recordings/${id}/audio`,
 
+  transcriptVttUrl: (id: string) => `${API_BASE}/api/recordings/${id}/transcript/vtt`,
+
   startTranscription: (id: string) => request<TranscriptJob>(`/api/recordings/${id}/transcript`, { method: "POST" }),
 
   getTranscriptStatus: (id: string) => request<TranscriptJob>(`/api/recordings/${id}/transcript/status`),

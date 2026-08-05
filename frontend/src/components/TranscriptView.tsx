@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { api } from "@/lib/api";
 import type { RecordingMeta, TranscriptJob, TranscriptResult } from "@/lib/api";
 
 interface Props {
@@ -51,6 +52,15 @@ export function TranscriptView({ recording, job, result, onTranscribe }: Props) 
   return (
     <ScrollArea className="h-full pr-4">
       <div className="flex flex-col gap-4">
+        <a
+          href={api.transcriptVttUrl(recording.id)}
+          download={`${recording.name}.vtt`}
+          className="self-start"
+        >
+          <Button variant="outline" size="sm">
+            Download .vtt
+          </Button>
+        </a>
         {result.segments.map((seg, i) => (
           <div key={i} className="flex flex-col gap-0.5">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
