@@ -77,3 +77,8 @@ class TranscriptResult(BaseModel):
     recording_id: str
     language: str | None = None
     segments: list[TranscriptSegment]
+
+
+class SpeakerRenameRequest(BaseModel):
+    old_label: str
+    new_name: str

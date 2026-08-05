@@ -2,8 +2,13 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import Response
 
 from app import storage
-from app.models import TranscriptJob, TranscriptResult
-from app.transcription import get_job, get_result, start_transcription
+from app.models import SpeakerRenameRequest, TranscriptJob, TranscriptResult
+from app.transcription import (
+    get_job,
+    get_result,
+    rename_speaker,
+    start_transcription,
+)
 from app.vtt import to_vtt
 
 router = APIRouter(
@@ -51,3 +56,13 @@ def get_transcript_vtt(recording_id: str) -> Response:
             "Content-Disposition": f'attachment; filename="{recording_id}.vtt"'
         },
     )
+
+
+@router.patch("/speakers", response_model=TranscriptResult)
+def rename_transcript_speaker(
+    recording_id: str, body: SpeakerRenameRequest
+) -> TranscriptResult:
+    result = rename_speaker(recording_id, body.old_label, body.new_name)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Transcript not found")
+    return result
