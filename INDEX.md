@@ -8,6 +8,7 @@
 - [README.md](README.md) — setup and usage
 - [docs/adr/0001-system-audio-capture.md](docs/adr/0001-system-audio-capture.md) — how Teams call audio gets captured
 - [docs/adr/0002-transcription-stack.md](docs/adr/0002-transcription-stack.md) — whisperx / model choice
-- [docs/adr/0005-per-track-transcription.md](docs/adr/0005-per-track-transcription.md) — dual-track transcription + diarization + drift correction
 - [docs/adr/0003-electron-backend-packaging.md](docs/adr/0003-electron-backend-packaging.md) — how the macOS app runs the backend
-- [docs/adr/0007-mps-alignment-diarization.md](docs/adr/0007-mps-alignment-diarization.md) — MPS for word alignment + diarization
+- [docs/adr/0004-per-track-transcription.md](docs/adr/0004-per-track-transcription.md) — dual-track transcription + diarization + drift correction
+- [docs/adr/0005-bleed-transcript-dedup.md](docs/adr/0005-bleed-transcript-dedup.md) — post-hoc transcript-level dedup for mic/speaker bleed
+- [docs/adr/0006-mps-alignment-diarization.md](docs/adr/0006-mps-alignment-diarization.md) — MPS for word alignment + diarization

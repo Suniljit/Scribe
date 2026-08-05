@@ -1,10 +1,10 @@
-# ADR 0006: Post-hoc transcript-level dedup for mic/speaker bleed
+# ADR 0005: Post-hoc transcript-level dedup for mic/speaker bleed
 
 ## Status
 Accepted
 
 ## Context
-[ADR 0005](0005-per-track-transcription.md) transcribes the `mic` and
+[ADR 0004](0004-per-track-transcription.md) transcribes the `mic` and
 `speaker` tracks independently and merges them by timestamp. `Recorder`
 already runs a cross-correlation bleed *detector* (`_detect_bleed` in
 `backend/app/recorder.py`, reused as a periodic drift estimator by
@@ -29,7 +29,7 @@ Two classes of fix were considered:
    near-end signals to share a tightly-synchronized clock (delay stable to a
    few ms). Scribe's `mic_device_index` and `speaker_device_index` are two
    independent `sd.InputStream`s on independent hardware clocks — the same
-   reason ADR 0005 needed piecewise drift correction — so a real AEC
+   reason ADR 0004 needed piecewise drift correction — so a real AEC
    implementation would require re-architecting capture around a shared
    clock domain, for a live-audio guarantee this offline, post-record
    pipeline doesn't otherwise need.
@@ -76,7 +76,7 @@ Implement **post-hoc, transcript-level dedup**, not AEC, gated strictly on
   best-match wins), to avoid one speaker line silently absorbing multiple
   distinct mic lines.
 
-This supersedes ADR 0005's "Overlapping (cross-talk) segments are not
+This supersedes ADR 0004's "Overlapping (cross-talk) segments are not
 specially annotated" statement, but only for the bleed case. Genuine
 cross-talk between two different real speakers on separate tracks (no
 `bleed_detected`) is untouched — those segments still appear as-is,

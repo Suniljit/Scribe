@@ -1,4 +1,4 @@
-# ADR 0007: Use MPS for word alignment and speaker diarization
+# ADR 0006: Use MPS for word alignment and speaker diarization
 
 ## Status
 Accepted

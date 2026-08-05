@@ -2,7 +2,7 @@
 
 ## Question
 
-[ADR 0005](../adr/0005-per-track-transcription.md) transcribes the `mic` and
+[ADR 0004](../adr/0004-per-track-transcription.md) transcribes the `mic` and
 `speaker` tracks independently and merges them by timestamp. `Recorder`
 already runs a cross-correlation bleed *detector* (`_detect_bleed` in
 `backend/app/recorder.py:195`, reused as a periodic drift estimator at
@@ -85,7 +85,7 @@ architecture is the opposite of that by construction:
   and `speaker_device_index` as **two independent `sd.InputStream`s**, each
   with its own `default_samplerate` pulled from `sd.query_devices` — i.e.
   two independent hardware/driver clocks.
-- ADR 0005 already had to add drift correction (`_estimate_drift`) precisely
+- ADR 0004 already had to add drift correction (`_estimate_drift`) precisely
   *because* those two clocks disagree over time — the ADR calls this out
   as a real, previously-masked risk of running mic and speaker on
   independent hardware clocks.
@@ -94,7 +94,7 @@ architecture is the opposite of that by construction:
   "speaker" track is captured from a virtual loopback device (BlackHole),
   a separate driver from the physical mic, per
   [docs/research/system-audio-capture-separation.md](system-audio-capture-separation.md)
-  (referenced by ADR 0005) and the existing ADR
+  (referenced by ADR 0004) and the existing ADR
   [0001-system-audio-capture.md](../adr/0001-system-audio-capture.md).
 
 Speex's own manual states the failure mode directly: independently-clocked
@@ -141,7 +141,7 @@ rather than raw-sample cancellation.
 1. Use the lag already computed by `_detect_bleed`/`_estimate_drift`
    (`backend/app/recorder.py:195` and `:226`) to shift each speaker-track
    segment's timestamp onto the mic track's timeline — this machinery
-   already exists for drift correction per ADR 0005 and needs no new
+   already exists for drift correction per ADR 0004 and needs no new
    signal-processing code, just reuse of its output.
 2. After alignment, for each mic segment, find speaker-track segments whose
    (lag-corrected) time window overlaps it.
@@ -180,7 +180,7 @@ reasons visible directly in the primary sources above:
   delay must stay smaller than the filter length throughout. Scribe's
   `_estimate_drift` already produces a **piecewise, not single-value**, lag
   table for exactly this reason (`DRIFT_RESYNC_WINDOW_SECONDS` windows, ADR
-  0005) — a single global lag/gain single-tap subtraction would systematically
+  0004) — a single global lag/gain single-tap subtraction would systematically
   under- or over-cancel outside whichever window the lag was fit to, unlike
   an adaptive filter that re-converges continuously.
 - A single-tap subtraction has no way to model reverberation/room echo
@@ -219,7 +219,7 @@ properly.
   regions of one mono input where its model believes ≥2 speakers are
   active simultaneously. It has no concept of "this is a second copy of a
   waveform that was also captured by a different microphone." Per ADR
-  0005 (citing the earlier
+  0004 (citing the earlier
   [system-audio-capture-separation.md](system-audio-capture-separation.md)
   research), pyannote silently downmixes any multi-channel input to mono
   rather than treating channel identity as a diarization signal — so it
@@ -227,7 +227,7 @@ properly.
   deduplication for free.
 - **faster-whisper** likewise has no cross-track or reference-signal
   awareness; it transcribes whatever mono signal it is given, which is why
-  ADR 0005 already had to run it independently per track.
+  ADR 0004 already had to run it independently per track.
 
 Conclusion for §4: neither library has a built-in feature for this exact
 problem. Overlapped speech detection solves a related but different
@@ -243,7 +243,7 @@ Reasoning, tied back to §§1–4:
 - Real-time AEC (§1) needs the near-end and far-end signals on a common,
   tightly-synchronized clock. Scribe's mic and speaker tracks are
   deliberately independent `sd.InputStream`s on independent devices
-  (physical mic vs. BlackHole loopback), which is *why* ADR 0005 needed
+  (physical mic vs. BlackHole loopback), which is *why* ADR 0004 needed
   drift correction in the first place — the same independent-clock
   situation that Speex's own docs call out as the case where echo
   cancellation "will not work." Retrofitting AEC would mean re-architecting
@@ -265,10 +265,10 @@ Reasoning, tied back to §§1–4:
 - `backend/app/recorder.py`: no changes to the detection logic itself.
   `_detect_bleed`'s boolean and `_estimate_drift`'s piecewise lag table
   already carry everything the merge step needs; they just need to be
-  exposed to (or already are exposed to, via `RecordingMeta` per ADR 0005)
+  exposed to (or already are exposed to, via `RecordingMeta` per ADR 0004)
   the merge step alongside `bleed_detected`.
 - Merge step (wherever mic/speaker segments are interleaved and namespaced
-  today per ADR 0005 — the "merge by timestamp" logic that consumes
+  today per ADR 0004 — the "merge by timestamp" logic that consumes
   `drift_offsets`): after applying the existing lag-based timestamp
   correction, add a pass that, for each mic segment, looks for a
   speaker-track segment whose corrected time window overlaps it and whose
