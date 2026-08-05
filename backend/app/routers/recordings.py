@@ -1,7 +1,8 @@
 import uuid
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, HTTPException
+import numpy as np
+from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse
 
 from app import storage
@@ -27,7 +28,12 @@ def list_recordings() -> list[RecordingMeta]:
 @router.post("/start", response_model=RecordingMeta)
 def start_recording(req: StartRecordingRequest) -> RecordingMeta:
     recording_id = uuid.uuid4().hex[:12]
-    recorder = Recorder(recording_id, req.mic_device_index, req.speaker_device_index)
+    recorder = Recorder(
+        recording_id,
+        req.mic_device_index,
+        req.speaker_device_index,
+        capture_source=req.capture_source,
+    )
     try:
         recorder.start()
     except Exception as exc:
@@ -44,9 +50,35 @@ def start_recording(req: StartRecordingRequest) -> RecordingMeta:
         status=RecordingStatus.RECORDING,
         mic_device_index=req.mic_device_index,
         speaker_device_index=req.speaker_device_index,
+        capture_source=req.capture_source,
     )
     storage.save_meta(meta)
     return meta
+
+
+@router.websocket("/{recording_id}/stream")
+async def stream_audio(websocket: WebSocket, recording_id: str, track: str) -> None:
+    """Ingests raw mono float32 PCM chunks pushed from a browser/Electron-side
+    capture (see frontend/src/lib/capture.ts), for recordings started with
+    capture_source="browser-push". Replaces reading a CoreAudio loopback
+    device for the speaker leg (ADR 0007)."""
+    recorder = _active_recorders.get(recording_id)
+    if (
+        recorder is None
+        or recorder.capture_source != "browser-push"
+        or track not in ("mic", "speaker")
+    ):
+        await websocket.close(code=4404)
+        return
+
+    await websocket.accept()
+    try:
+        while True:
+            data = await websocket.receive_bytes()
+            samples = np.frombuffer(data, dtype=np.float32)
+            recorder.write_chunk(track, samples)
+    except WebSocketDisconnect:
+        pass
 
 
 @router.post("/{recording_id}/stop", response_model=RecordingMeta)

@@ -30,32 +30,24 @@ Whisper model and speaker diarization — nothing leaves your machine. See
   "Gated" models require accepting the model's terms on Hugging Face (while
   logged in) before your token can download it — visit each gated model's
   page above and click "Agree and access repository".
-- To capture **speaker audio** (e.g. Teams call audio), macOS gives
-  sandboxed apps no way to record arbitrary system output directly, so you
-  need to install [BlackHole 2ch](https://github.com/ExistentialAudio/BlackHole)
-  and route your system audio through it. See
-  [ADR 0001](docs/adr/0001-system-audio-capture.md) for why this is
-  necessary. One-time setup:
-
-  1. Install [BlackHole 2ch](https://github.com/ExistentialAudio/BlackHole)
-     (download the installer from the link, or `brew install blackhole-2ch`).
-  2. Open **Audio MIDI Setup** (Applications > Utilities > Audio MIDI
-     Setup.app).
-  3. Click the **+** button in the bottom-left corner and choose
-     **Create Multi-Output Device**.
-  4. In the device list on the right, check both your normal output (e.g.
-     "MacBook Pro Speakers" or your headphones) and **"BlackHole 2ch"**.
-     Leave your normal output as the primary/master device so timing stays
-     correct.
-  5. Before starting a call, open **System Settings > Sound > Output** and
-     select the Multi-Output Device you just created. You'll still hear
-     audio normally — it's now also being duplicated into BlackHole.
-  6. In Scribe, pick **"BlackHole 2ch"** as the speaker input device (it
-     will be labeled "BlackHole 2ch (likely loopback)" in the device
-     dropdown).
-  7. After the call, switch **System Settings > Sound > Output** back to
-     your normal speakers/headphones if you don't want audio routed
-     through the Multi-Output Device all the time.
+- **Speaker audio** (e.g. Teams call audio) is captured automatically, no
+  setup required — Scribe uses native OS capture (see
+  [ADR 0007](docs/adr/0007-native-audio-capture.md)):
+  - **macOS app**: the first time you record, macOS will prompt for a
+    permission grant (Screen Recording, or a narrower system-audio prompt on
+    macOS 14.2+) — accept it once and system audio capture works from then
+    on.
+  - **Browser**: on Chrome or Edge, clicking Record will ask you to share
+    your screen — audio is captured, no video is recorded or stored. Safari,
+    Firefox, and older macOS/Chrome combinations don't support this, so
+    recording falls back to microphone-only automatically (a banner in the
+    app will say so).
+  - If your browser doesn't support screen-share audio capture at all (very
+    old browsers), Scribe falls back to the original manual device picker
+    described in [ADR 0001](docs/adr/0001-system-audio-capture.md), which
+    still works if you already have
+    [BlackHole](https://github.com/ExistentialAudio/BlackHole) or a similar
+    loopback driver installed and routed via a Multi-Output Device.
 
 ## Configuration
 

@@ -7,12 +7,17 @@ import { RecordingsList } from "@/components/RecordingsList";
 import { TranscriptView } from "@/components/TranscriptView";
 import { api } from "@/lib/api";
 import { formatTime } from "@/lib/utils";
+import { detectCaptureMode, startBrowserCapture } from "@/lib/capture";
+import type { BrowserCapture } from "@/lib/capture";
 import type { AudioDevice, RecordingMeta, TranscriptJob, TranscriptResult } from "@/lib/api";
 
 function App() {
+  const [captureMode] = useState(() => detectCaptureMode());
   const [devices, setDevices] = useState<AudioDevice[]>([]);
   const [micIndex, setMicIndex] = useState<number | null>(null);
   const [speakerIndex, setSpeakerIndex] = useState<number | null>(null);
+  const [speakerCaptureNote, setSpeakerCaptureNote] = useState<string | null>(null);
+  const browserCaptureRef = useRef<BrowserCapture | null>(null);
 
   const [recordings, setRecordings] = useState<RecordingMeta[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -32,18 +37,20 @@ function App() {
   }, []);
 
   useEffect(() => {
-    api
-      .listDevices()
-      .then((list) => {
-        setDevices(list);
-        const mic = list.find((d) => !d.is_likely_loopback);
-        const speaker = list.find((d) => d.is_likely_loopback);
-        if (mic) setMicIndex(mic.index);
-        if (speaker) setSpeakerIndex(speaker.index);
-      })
-      .catch((e) => setError(String(e)));
+    if (captureMode === "coreaudio-manual") {
+      api
+        .listDevices()
+        .then((list) => {
+          setDevices(list);
+          const mic = list.find((d) => !d.is_likely_loopback);
+          const speaker = list.find((d) => d.is_likely_loopback);
+          if (mic) setMicIndex(mic.index);
+          if (speaker) setSpeakerIndex(speaker.index);
+        })
+        .catch((e) => setError(String(e)));
+    }
     refreshRecordings().catch((e) => setError(String(e)));
-  }, [refreshRecordings]);
+  }, [captureMode, refreshRecordings]);
 
   const selectedRecording = recordings.find((r) => r.id === selectedId) ?? null;
 
@@ -76,10 +83,41 @@ function App() {
   }, [job, selectedId]);
 
   const handleStart = async () => {
-    if (micIndex === null) return;
     setError(null);
+    setSpeakerCaptureNote(null);
+
+    if (captureMode === "coreaudio-manual") {
+      if (micIndex === null) return;
+      try {
+        const meta = await api.startRecording(micIndex, speakerIndex);
+        setActiveRecordingId(meta.id);
+        setSelectedId(meta.id);
+        setElapsed(0);
+        await refreshRecordings();
+        elapsedTimer.current = setInterval(() => setElapsed((e) => e + 1), 1000);
+      } catch (e) {
+        setError(String(e));
+      }
+      return;
+    }
+
     try {
-      const meta = await api.startRecording(micIndex, speakerIndex);
+      const meta = await api.startBrowserRecording();
+      try {
+        const capture = await startBrowserCapture(captureMode, meta.id);
+        browserCaptureRef.current = capture;
+        if (!capture.hasSpeaker) {
+          setSpeakerCaptureNote(
+            captureMode === "browser-displaymedia"
+              ? "System audio capture isn't available in this browser — recording microphone only."
+              : "System audio capture wasn't granted — recording microphone only.",
+          );
+        }
+      } catch (captureError) {
+        await api.stopRecording(meta.id).catch(() => {});
+        await refreshRecordings();
+        throw captureError;
+      }
       setActiveRecordingId(meta.id);
       setSelectedId(meta.id);
       setElapsed(0);
@@ -93,6 +131,10 @@ function App() {
   const handleStop = async () => {
     if (!activeRecordingId) return;
     try {
+      if (browserCaptureRef.current) {
+        await browserCaptureRef.current.stop();
+        browserCaptureRef.current = null;
+      }
       await api.stopRecording(activeRecordingId);
     } catch (e) {
       setError(String(e));
@@ -170,23 +212,33 @@ function App() {
       <main className="flex flex-1 flex-col gap-6 overflow-hidden p-6">
         <div className="flex flex-col gap-4 rounded-lg border p-4">
           <div className="flex flex-wrap items-end gap-4">
-            <DeviceSelector
-              label="Microphone"
-              devices={devices}
-              value={micIndex}
-              onChange={setMicIndex}
-              disabled={activeRecordingId !== null}
-            />
-            <DeviceSelector
-              label="Speaker (system audio)"
-              devices={devices.filter((d) => d.is_likely_loopback)}
-              value={speakerIndex}
-              onChange={setSpeakerIndex}
-              allowNone
-              disabled={activeRecordingId !== null}
-            />
+            {captureMode === "coreaudio-manual" ? (
+              <>
+                <DeviceSelector
+                  label="Microphone"
+                  devices={devices}
+                  value={micIndex}
+                  onChange={setMicIndex}
+                  disabled={activeRecordingId !== null}
+                />
+                <DeviceSelector
+                  label="Speaker (system audio)"
+                  devices={devices.filter((d) => d.is_likely_loopback)}
+                  value={speakerIndex}
+                  onChange={setSpeakerIndex}
+                  allowNone
+                  disabled={activeRecordingId !== null}
+                />
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                {captureMode === "electron-loopback"
+                  ? "System audio will be captured automatically (no setup needed)."
+                  : "Sharing your screen will include its audio — video won't be recorded."}
+              </p>
+            )}
             {activeRecordingId === null ? (
-              <Button onClick={handleStart} disabled={micIndex === null}>
+              <Button onClick={handleStart} disabled={captureMode === "coreaudio-manual" && micIndex === null}>
                 Record
               </Button>
             ) : (
@@ -195,6 +247,7 @@ function App() {
               </Button>
             )}
           </div>
+          {speakerCaptureNote && <p className="text-sm text-muted-foreground">{speakerCaptureNote}</p>}
           {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
 

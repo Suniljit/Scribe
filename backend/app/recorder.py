@@ -22,6 +22,11 @@ _BLEED_CORRELATION_THRESHOLD = 0.6
 _DRIFT_MAX_LAG_SECONDS = 1.0
 _DRIFT_MIN_CORRELATION = 0.15
 
+# Sample rate for capture_source="browser-push" tracks, matching the
+# AudioContext rate frontend/src/lib/capture.ts captures at (validated
+# gap-free at real-time pace during the native-capture spike).
+BROWSER_PUSH_SAMPLE_RATE = 48_000
+
 
 class RecorderError(RuntimeError):
     pass
@@ -32,18 +37,23 @@ class Recorder:
     streams, then mixes them down to a single mono WAV on stop.
 
     Streams are written incrementally to temp files so memory use stays flat
-    regardless of recording length.
+    regardless of recording length. Two capture sources are supported: the
+    original `sd.InputStream`-based CoreAudio devices, or chunks pushed from
+    a browser/Electron-side capture (see `write_chunk`), for the native
+    loopback capture path that replaces BlackHole (ADR 0007).
     """
 
     def __init__(
         self,
         recording_id: str,
-        mic_device_index: int,
+        mic_device_index: int | None,
         speaker_device_index: int | None = None,
+        capture_source: str = "coreaudio",
     ):
         self.recording_id = recording_id
         self.mic_device_index = mic_device_index
         self.speaker_device_index = speaker_device_index
+        self.capture_source = capture_source
 
         self._mic_path = RECORDINGS_DIR / f"{recording_id}.mic.tmp.wav"
         self._speaker_path = RECORDINGS_DIR / f"{recording_id}.speaker.tmp.wav"
@@ -63,6 +73,13 @@ class Recorder:
         self.drift_offsets: list[tuple[float, float]] = []
 
     def start(self) -> None:
+        if self.capture_source == "browser-push":
+            self._start_browser_push()
+        else:
+            self._start_coreaudio()
+        self._start_time = time.monotonic()
+
+    def _start_coreaudio(self) -> None:
         mic_info = sd.query_devices(self.mic_device_index)
         mic_rate = int(mic_info["default_samplerate"])
         self._mic_file = sf.SoundFile(
@@ -74,9 +91,7 @@ class Recorder:
         )
 
         def mic_callback(indata, frames, time_info, status):
-            with self._lock:
-                if self._mic_file is not None:
-                    self._mic_file.write(indata[:, :1])
+            self.write_chunk("mic", indata[:, :1])
 
         self._mic_stream = sd.InputStream(
             device=self.mic_device_index,
@@ -100,9 +115,7 @@ class Recorder:
             )
 
             def speaker_callback(indata, frames, time_info, status):
-                with self._lock:
-                    if self._speaker_file is not None:
-                        self._speaker_file.write(indata)
+                self.write_chunk("speaker", indata)
 
             self._speaker_stream = sd.InputStream(
                 device=self.speaker_device_index,
@@ -113,7 +126,38 @@ class Recorder:
             )
             self._speaker_stream.start()
 
-        self._start_time = time.monotonic()
+    def _start_browser_push(self) -> None:
+        self._mic_file = sf.SoundFile(
+            str(self._mic_path),
+            mode="w",
+            samplerate=BROWSER_PUSH_SAMPLE_RATE,
+            channels=1,
+            subtype="FLOAT",
+        )
+        # The speaker file is opened lazily in write_chunk, on its first
+        # "speaker" chunk: whether a speaker track exists at all isn't known
+        # until the renderer successfully starts one (system audio capture
+        # can fail/be declined independently of the mandatory mic capture -
+        # see frontend/src/lib/capture.ts).
+
+    def write_chunk(self, track: str, samples) -> None:
+        """Append a chunk of mono float32 PCM samples to the given track's
+        temp file. Used both by the CoreAudio `sd.InputStream` callbacks
+        above and by the browser-push WebSocket ingestion route."""
+        with self._lock:
+            if track == "mic":
+                if self._mic_file is not None:
+                    self._mic_file.write(samples)
+            elif track == "speaker":
+                if self._speaker_file is None:
+                    self._speaker_file = sf.SoundFile(
+                        str(self._speaker_path),
+                        mode="w",
+                        samplerate=BROWSER_PUSH_SAMPLE_RATE,
+                        channels=1,
+                        subtype="FLOAT",
+                    )
+                self._speaker_file.write(samples)
 
     def stop(self) -> tuple[Path, float]:
         duration = time.monotonic() - (self._start_time or time.monotonic())
@@ -186,7 +230,7 @@ class Recorder:
 def _resample_to(audio: np.ndarray, orig_rate: int, target_rate: int) -> np.ndarray:
     if audio.ndim > 1:
         audio = audio.mean(axis=1)
-    if orig_rate == target_rate:
+    if orig_rate == target_rate or len(audio) == 0:
         return audio
     target_len = round(len(audio) * target_rate / orig_rate)
     return resample(audio, target_len).astype(np.float32)
