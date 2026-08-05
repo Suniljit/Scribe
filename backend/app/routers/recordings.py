@@ -5,7 +5,12 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
 from app import storage
-from app.models import RecordingMeta, RecordingStatus, StartRecordingRequest
+from app.models import (
+    RecordingMeta,
+    RecordingStatus,
+    RenameRecordingRequest,
+    StartRecordingRequest,
+)
 from app.recorder import Recorder
 from app.transcription import delete_job
 
@@ -84,6 +89,16 @@ def get_recording_audio(recording_id: str) -> FileResponse:
     if meta is None or not meta.audio_path:
         raise HTTPException(status_code=404, detail="Recording audio not found")
     return FileResponse(meta.audio_path, media_type="audio/wav")
+
+
+@router.patch("/{recording_id}", response_model=RecordingMeta)
+def rename_recording(recording_id: str, req: RenameRecordingRequest) -> RecordingMeta:
+    meta = storage.load_meta(recording_id)
+    if meta is None:
+        raise HTTPException(status_code=404, detail="Recording not found")
+    meta.name = req.name
+    storage.save_meta(meta)
+    return meta
 
 
 @router.delete("/{recording_id}")

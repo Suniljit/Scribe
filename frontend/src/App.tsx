@@ -124,6 +124,15 @@ function App() {
     }
   };
 
+  const handleRename = async (id: string, name: string) => {
+    try {
+      await api.renameRecording(id, name);
+      await refreshRecordings();
+    } catch (e) {
+      setError(String(e));
+    }
+  };
+
   const handleTranscribe = async () => {
     if (!selectedId) return;
     try {
@@ -147,6 +156,7 @@ function App() {
             selectedId={selectedId}
             onSelect={setSelectedId}
             onDelete={handleDelete}
+            onRename={handleRename}
           />
         </div>
       </aside>

@@ -1,6 +1,6 @@
 from enum import Enum
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 
 
 class AudioDevice(BaseModel):
@@ -16,6 +16,18 @@ class StartRecordingRequest(BaseModel):
     mic_device_index: int
     speaker_device_index: int | None = None
     name: str | None = None
+
+
+class RenameRecordingRequest(BaseModel):
+    name: str = Field(min_length=1)
+
+    @field_validator("name")
+    @classmethod
+    def _strip_and_validate(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("name must not be blank")
+        return v
 
 
 class RecordingStatus(str, Enum):
