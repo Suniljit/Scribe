@@ -93,6 +93,30 @@ prompt immediately after starting a browser-push recording, so `stop()` runs
 against an empty track). This is now handled by returning the empty array
 unresampled.
 
+**Follow-up: static start-offset between tracks.** `startBrowserCapture`
+(`frontend/src/lib/capture.ts`) starts the mic leg's `getUserMedia` +
+WebSocket + `AudioWorklet` pipeline and awaits it to completion before even
+requesting the speaker leg, which then needs its own
+`getDisplayMedia`/loopback permission negotiation — a user-driven share
+picker that can take anywhere from ~0ms to several seconds. Each track's
+WAV file starts writing from whenever its own pipeline became ready, so
+"sample 0" of the mic file and "sample 0" of the speaker file can represent
+wall-clock moments seconds apart. This is a **static** offset baked in
+before any audio flows, distinct from the ongoing clock drift ADR 0005
+addresses, and it's large enough to exceed `_estimate_drift`'s ±1s lag
+search window — so duplicate segments bled from speaker into mic could land
+far outside `_dedup_bleed_segments`'s ±0.5s tolerance and never get merged.
+
+Fixed by having the frontend measure how much later (`performance.now()`,
+same-page clock) the speaker pipeline became ready relative to the mic
+pipeline, reporting it via `POST /api/recordings/{id}/track-offset`
+(`TrackOffsetRequest`), and having `Recorder._read_tracks` pad whichever
+track started later with that many leading silence samples
+(`_pad_track_start_offset`) before mixdown/drift-estimation/dedup ever run.
+`_estimate_drift` and `_dedup_bleed_segments` are unchanged — they now only
+have to account for genuine small clock drift, which is what they were
+designed for.
+
 ## Consequences
 - Electron-app users no longer need to install BlackHole or build a
   Multi-Output Device; first-run friction drops to an OS permission prompt

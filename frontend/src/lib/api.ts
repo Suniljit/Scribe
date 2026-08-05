@@ -83,6 +83,12 @@ export const api = {
 
   stopRecording: (id: string) => request<RecordingMeta>(`/api/recordings/${id}/stop`, { method: "POST" }),
 
+  setTrackStartOffset: (id: string, offsetMs: number) =>
+    request<RecordingMeta>(`/api/recordings/${id}/track-offset`, {
+      method: "POST",
+      body: JSON.stringify({ offset_ms: offsetMs }),
+    }),
+
   deleteRecording: (id: string) =>
     request<{ deleted: string }>(`/api/recordings/${id}`, { method: "DELETE" }),
 
