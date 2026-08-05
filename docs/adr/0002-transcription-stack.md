@@ -30,6 +30,8 @@ audio ever leaves the machine.
   (several GB) and requires an `HF_TOKEN`; documented in the README.
 - Transcription is CPU-bound and slower than real-time, which is an accepted
   tradeoff given the stated preference for accuracy over speed.
-- Swapping to a smaller Whisper model or a GPU/MPS backend later only
-  requires changing `TRANSCRIBE_WHISPER_MODEL`/`TRANSCRIBE_WHISPER_COMPUTE`
-  env vars.
+- Swapping to a smaller Whisper model later only requires changing the
+  `TRANSCRIBE_WHISPER_MODEL`/`TRANSCRIBE_WHISPER_COMPUTE` env vars. The
+  whisper stage itself stays on CPU as long as it runs on CTranslate2 — see
+  [ADR 0007](0007-mps-alignment-diarization.md) for the alignment/diarization
+  stages, which are plain-PyTorch and do use MPS.
