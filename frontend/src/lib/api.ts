@@ -77,6 +77,12 @@ export const api = {
   deleteRecording: (id: string) =>
     request<{ deleted: string }>(`/api/recordings/${id}`, { method: "DELETE" }),
 
+  renameRecording: (id: string, name: string) =>
+    request<RecordingMeta>(`/api/recordings/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ name }),
+    }),
+
   audioUrl: (id: string) => `${API_BASE}/api/recordings/${id}/audio`,
 
   transcriptVttUrl: (id: string) => `${API_BASE}/api/recordings/${id}/transcript/vtt`,
