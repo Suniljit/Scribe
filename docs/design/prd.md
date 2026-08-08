@@ -2,7 +2,8 @@
 doc_type: prd
 status: draft
 depends_on: []
-last_updated: 2026-08-03
+related: []
+last_updated: 2026-08-08
 ---
 
 # Scribe — PRD
@@ -34,26 +35,15 @@ Single-user, local-first tool — no multi-user roles or auth in scope.
 
 ### Must-haves (MVP)
 
-- **Recording** — select a mic device and a speaker/loopback device, start
-  and stop a recording, save the audio locally. Covers both online meetings
-  (mic + speaker dual-track) and physical meetings (mic-only). No
-  pause/resume, no live transcript preview.
-- **Transcription** — fully local transcription with speaker diarization,
-  producing a single timestamped, speaker-labeled transcript per meeting.
-- **Notes generation** — structured notes per meeting: summary, action
-  items, key decisions, and a topic breakdown. Generated via a local or
-  cloud model, chosen in settings (cloud is the default; the active choice
-  is always visible to the user).
-- **Projects** — create and rename projects, with project-level metadata
-  (e.g. description); assign each meeting to a project (or leave
-  unassigned); view/filter meetings by project and by date.
-- **Meeting chatbot** — chat with a single meeting, answers grounded only
-  in that meeting's transcript and notes.
-- **Project chatbot** — chat across all meetings within one project,
-  answers synthesized across that project's transcripts and notes only (no
-  cross-project search).
-- **Settings** — local/cloud model choice, configured independently for
-  notes generation and for chat (two separate toggles, not shared).
+| ID | Feature | Summary |
+|---|---|---|
+| `FR-01` | Recording | Select a mic device and a speaker/loopback device, start and stop a recording, save the audio locally. Covers both online meetings (mic + speaker dual-track) and physical meetings (mic-only). No pause/resume, no live transcript preview. |
+| `FR-02` | Transcription | Fully local transcription with speaker diarization, producing a single timestamped, speaker-labeled transcript per meeting. |
+| `FR-03` | Notes Generation | Structured notes per meeting: summary, action items, key decisions, and a topic breakdown. Generated via a local or cloud model, chosen in settings (cloud is the default; the active choice is always visible to the user). |
+| `FR-04` | Projects | Create and rename projects, with project-level metadata (e.g. description); assign each meeting to a project (or leave unassigned); view/filter meetings by project and by date. |
+| `FR-05` | Meeting Chatbot | Chat with a single meeting, answers grounded only in that meeting's transcript and notes. |
+| `FR-06` | Project Chatbot | Chat across all meetings within one project, answers synthesized across that project's transcripts and notes only (no cross-project search). |
+| `FR-07` | Settings | Local/cloud model choice, configured independently for notes generation and for chat (two separate toggles, not shared). |
 
 ### Nice-to-haves
 
@@ -76,54 +66,54 @@ Single-user, local-first tool — no multi-user roles or auth in scope.
 
 ## User Stories & Acceptance Criteria
 
-| User Story | Feature | Summary |
-|---|---|---|
-| [Record an online meeting](#record-an-online-meeting) | Recording | Dual-track mic + speaker capture, saved locally |
-| [Record a physical meeting](#record-a-physical-meeting) | Recording | Mic-only capture for in-person meetings |
-| [Get a diarized transcript](#get-a-diarized-transcript) | Transcription | Local, speaker-labeled transcript after recording |
-| [Get structured meeting notes](#get-structured-meeting-notes) | Notes Generation | Summary, action items, decisions, topics |
-| [Choose local vs cloud for notes](#choose-local-vs-cloud-for-notes) | Notes Generation | Model choice toggle, always visible |
-| [Organize meetings into projects](#organize-meetings-into-projects) | Projects | Create projects, assign meetings, filter |
-| [Chat with a single meeting](#chat-with-a-single-meeting) | Meeting Chatbot | Q&A grounded in one meeting's transcript |
-| [Chat across a project](#chat-across-a-project) | Project Chatbot | Q&A across all meetings in one project |
+| ID | User Story | Implements | Summary |
+|---|---|---|---|
+| `US-01` | [Record an online meeting](#us-01--record-an-online-meeting) | `FR-01` | Dual-track mic + speaker capture, saved locally |
+| `US-02` | [Record a physical meeting](#us-02--record-a-physical-meeting) | `FR-01` | Mic-only capture for in-person meetings |
+| `US-03` | [Get a diarized transcript](#us-03--get-a-diarized-transcript) | `FR-02` | Local, speaker-labeled transcript after recording |
+| `US-04` | [Get structured meeting notes](#us-04--get-structured-meeting-notes) | `FR-03` | Summary, action items, decisions, topics |
+| `US-05` | [Choose local vs cloud for notes](#us-05--choose-local-vs-cloud-for-notes) | `FR-03`, `FR-07` | Model choice toggle, always visible |
+| `US-06` | [Organize meetings into projects](#us-06--organize-meetings-into-projects) | `FR-04` | Create projects, assign meetings, filter |
+| `US-07` | [Chat with a single meeting](#us-07--chat-with-a-single-meeting) | `FR-05` | Q&A grounded in one meeting's transcript |
+| `US-08` | [Chat across a project](#us-08--chat-across-a-project) | `FR-06` | Q&A across all meetings in one project |
 
-### Record an online meeting
-**Feature:** Recording
+### `US-01` — Record an online meeting
+**Implements:** `FR-01`
 **As a** solo user, **I want** to capture both my mic and the meeting's speaker/loopback audio, **so that** I have a full local recording of an online meeting without a bot joining the call.
 **Given** I've selected a mic device and a speaker/loopback device, **When** I start a recording and later stop it, **Then** the app saves the meeting's audio locally, with no audio sent off the device.
 
-### Record a physical meeting
-**Feature:** Recording
+### `US-02` — Record a physical meeting
+**Implements:** `FR-01`
 **As a** solo user, **I want** to record an in-person meeting using just my mic, **so that** I get the same local capture and notes pipeline for meetings a cloud bot could never join.
 **Given** I'm in an in-person meeting with no online call running, **When** I start a recording using only my mic device, **Then** the app captures and saves the meeting audio the same way as an online meeting.
 
-### Get a diarized transcript
-**Feature:** Transcription
+### `US-03` — Get a diarized transcript
+**Implements:** `FR-02`
 **As a** solo user, **I want** a speaker-labeled transcript produced entirely on-device, **so that** I can tell who said what without any audio leaving my machine.
 **Given** a completed recording, **When** transcription runs, **Then** I get a single timestamped transcript with speaker labels, produced entirely by local models.
 
-### Get structured meeting notes
-**Feature:** Notes Generation
+### `US-04` — Get structured meeting notes
+**Implements:** `FR-03`
 **As a** solo user, **I want** structured notes generated from the transcript, **so that** I never have to write up a summary, action items, or decisions by hand.
 **Given** a completed transcript, **When** notes generation runs, **Then** I get a summary, action items, key decisions, and a topic breakdown, generated via my selected local or cloud model.
 
-### Choose local vs cloud for notes
-**Feature:** Notes Generation
+### `US-05` — Choose local vs cloud for notes
+**Implements:** `FR-03`, `FR-07`
 **As a** solo user, **I want** to pick and always see whether notes generation is running locally or in the cloud, **so that** I control the privacy/quality tradeoff for each meeting's notes.
 **Given** I'm in settings, **When** I toggle notes generation between local and cloud, **Then** subsequent notes generation uses that model, and the active choice is always visible.
 
-### Organize meetings into projects
-**Feature:** Projects
+### `US-06` — Organize meetings into projects
+**Implements:** `FR-04`
 **As a** solo user, **I want** to group meetings into projects and filter by project or date, **so that** I can find past meetings and decisions without scrolling through everything.
 **Given** one or more recorded meetings, **When** I create a project and assign meetings to it, **Then** I can view and filter meetings by that project and by date.
 
-### Chat with a single meeting
-**Feature:** Meeting Chatbot
+### `US-07` — Chat with a single meeting
+**Implements:** `FR-05`
 **As a** solo user, **I want** to ask questions about one meeting, **so that** I can recall specific details without rereading the whole transcript.
 **Given** a meeting with a completed transcript, **When** I ask a question in that meeting's chat, **Then** I get an answer grounded only in that meeting's transcript and notes.
 
-### Chat across a project
-**Feature:** Project Chatbot
+### `US-08` — Chat across a project
+**Implements:** `FR-06`
 **As a** solo user, **I want** to ask questions across all meetings in a project, **so that** I can track decisions and context that span multiple meetings in that project.
 **Given** a project with multiple meetings, **When** I ask a question in the project-level chat, **Then** I get an answer synthesized across all meetings' transcripts and notes within that project only.
 
@@ -133,16 +123,14 @@ Framework: **HEART** — this is a personal productivity tool, not a
 growth-stage product, so usability/outcome metrics fit better than
 acquisition-funnel metrics.
 
-| Metric | Target | How measured |
-|---|---|---|
-| Task success | ≥90% of meetings produce usable notes with zero manual edits | Track whether generated notes for each meeting were accepted as-is vs. edited/discarded |
-| Adoption | 100% of meetings (online + physical) captured via Scribe | Compare meetings recorded in Scribe against actual meetings held, over a month of daily use |
-| Retention | Scribe remains the primary meeting-capture tool after 4 weeks | Continued weekly recording activity, no reversion to manual note-taking |
-| Engagement | ≥1 chatbot query per meeting on average | Chat usage count per meeting/project over a month |
+| Metric | Target | Measures | How measured |
+|---|---|---|---|
+| Task success | ≥90% of meetings produce usable notes with zero manual edits | `FR-03` | Track whether generated notes for each meeting were accepted as-is vs. edited/discarded |
+| Adoption | 100% of meetings (online + physical) captured via Scribe | `FR-01` | Compare meetings recorded in Scribe against actual meetings held, over a month of daily use |
+| Retention | Scribe remains the primary meeting-capture tool after 4 weeks | — | Continued weekly recording activity, no reversion to manual note-taking |
+| Engagement | ≥1 chatbot query per meeting on average | `FR-05`, `FR-06` | Chat usage count per meeting/project over a month |
 
 Task success ties to the "never take notes manually again" goal; adoption
 and retention validate the privacy-first pitch actually replaces prior
 tools; engagement confirms the chatbots deliver value beyond the notes
 themselves.
-
-## Related
