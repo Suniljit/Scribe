@@ -16,6 +16,7 @@ interface Props {
   onProject: (id: string) => void;
   onSettings: () => void;
   onNewRecording: () => void;
+  onNewProject: () => void;
   recordingActive: boolean;
 }
 
@@ -63,6 +64,7 @@ export function AppSidebar({
   onProject,
   onSettings,
   onNewRecording,
+  onNewProject,
   recordingActive,
 }: Props) {
   return (
@@ -98,8 +100,18 @@ export function AppSidebar({
         Unassigned
       </NavItem>
 
-      <div className="mt-3 mb-1 px-2.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-        Projects
+      <div className="mt-3 mb-1 flex items-center justify-between px-2.5">
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          Projects
+        </span>
+        <Button
+          onClick={onNewProject}
+          variant="ghost"
+          size="icon-xs"
+          aria-label="New project"
+        >
+          <Plus className="size-3.5" />
+        </Button>
       </div>
       <div className="flex-1 overflow-y-auto">
         {projects.length === 0 ? (
