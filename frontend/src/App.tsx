@@ -308,6 +308,10 @@ function App() {
           onProject={goProject}
           onSettings={goSettings}
           onNewRecording={() => setNewRecordingOpen(true)}
+          onNewProject={() => {
+            setProjectDialogDraft(null);
+            setProjectDialogOpen(true);
+          }}
           recordingActive={activeRecordingId !== null}
         />
       )}
