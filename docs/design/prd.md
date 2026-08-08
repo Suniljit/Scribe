@@ -38,12 +38,12 @@ Single-user, local-first tool — no multi-user roles or auth in scope.
 | ID | Feature | Summary |
 |---|---|---|
 | `FR-01` | Recording | Select a mic device and a speaker/loopback device, start and stop a recording, save the audio locally. Covers both online meetings (mic + speaker dual-track) and physical meetings (mic-only). No pause/resume, no live transcript preview. |
-| `FR-02` | Transcription | Fully local transcription with speaker diarization, producing a single timestamped, speaker-labeled transcript per meeting. |
-| `FR-03` | Notes Generation | Structured notes per meeting: summary, action items, key decisions, and a topic breakdown. Generated via a local or cloud model, chosen in settings (cloud is the default; the active choice is always visible to the user). |
-| `FR-04` | Projects | Create and rename projects, with project-level metadata (e.g. description); assign each meeting to a project (or leave unassigned); view/filter meetings by project and by date. |
+| `FR-02` | Transcription | Fully local transcription with speaker diarization, producing a single timestamped, speaker-labeled transcript per meeting. Triggered manually per meeting; the transcription model (e.g. whisper large-v3 vs. a faster/smaller variant) is chosen per-recording at that moment, with a default set in Settings. |
+| `FR-03` | Notes Generation | Structured notes per meeting: summary, action items, key decisions, and a topic breakdown. Triggered manually, after transcription completes. Generated via a local or cloud model, chosen in settings (cloud is the default; the active choice is always visible to the user). |
+| `FR-04` | Projects | Create, rename, and delete projects (delete blocked until the project is empty), with project-level metadata (e.g. description); assign each meeting to a project (or leave unassigned); view/filter meetings by project and by date. |
 | `FR-05` | Meeting Chatbot | Chat with a single meeting, answers grounded only in that meeting's transcript and notes. |
 | `FR-06` | Project Chatbot | Chat across all meetings within one project, answers synthesized across that project's transcripts and notes only (no cross-project search). |
-| `FR-07` | Settings | Local/cloud model choice, configured independently for notes generation and for chat (two separate toggles, not shared). |
+| `FR-07` | Settings | Local/cloud model choice, configured independently for notes generation and for chat (two separate toggles, not shared); a default transcription model; default mic/speaker devices for new recordings. |
 
 ### Nice-to-haves
 

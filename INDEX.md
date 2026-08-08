@@ -36,6 +36,7 @@ High-level map of this repo — what each top-level folder and root file covers.
 | Document | Status | Depends on | Description |
 |---|---|---|---|
 | [PRD](docs/design/prd.md) | draft | — | Problem, persona, scope, user stories, success metrics for Scribe |
+| [App Flow](docs/design/app-flow.md) | draft | PRD | Onboarding, core loops, screen map, edge logic for Scribe |
 
 ## ADRs
 
