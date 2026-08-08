@@ -46,6 +46,15 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
+    --color-app-bg: var(--app-bg);
+    --color-blob-a: var(--blob-a);
+    --color-blob-b: var(--blob-b);
+    --color-glass: var(--glass);
+    --color-glass-border: var(--glass-border);
+    --color-hairline: var(--hairline);
+    --color-brand: var(--brand);
+    --color-brand-foreground: var(--brand-foreground);
+    --color-brand-soft: var(--brand-soft);
 }
 
 :root {
@@ -81,6 +90,16 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+
+    --app-bg: oklch(0.94 0.006 95);
+    --blob-a: oklch(0.75 0.12 258 / 0.20);
+    --blob-b: oklch(0.8 0.1 25 / 0.14);
+    --glass: oklch(1 0 0 / 0.55);
+    --glass-border: oklch(0 0 0 / 0.07);
+    --hairline: oklch(0 0 0 / 0.07);
+    --brand: oklch(0.58 0.19 258);
+    --brand-foreground: oklch(1 0 0);
+    --brand-soft: oklch(0.58 0.19 258 / 0.12);
 }
 
 .dark {
@@ -115,6 +134,16 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
+
+    --app-bg: oklch(0.16 0.008 260);
+    --blob-a: oklch(0.5 0.16 258 / 0.30);
+    --blob-b: oklch(0.5 0.15 25 / 0.20);
+    --glass: oklch(1 0 0 / 0.06);
+    --glass-border: oklch(1 0 0 / 0.09);
+    --hairline: oklch(1 0 0 / 0.09);
+    --brand: oklch(0.72 0.15 258);
+    --brand-foreground: oklch(0.16 0.008 260);
+    --brand-soft: oklch(0.72 0.15 258 / 0.18);
 }
 
 @layer base {
